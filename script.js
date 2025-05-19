@@ -13,8 +13,14 @@ class PomodoroTimer {
         this.focusInput = document.getElementById('focus-input');
         this.focusText = '';
         
-        // Initialize audio
+        // Initialize audio with better mobile support
         this.alarmSound = new Audio('sound/Soul Train A Comin.mp3');
+        this.alarmSound.preload = 'auto';
+        this.alarmSound.load();
+        
+        // Add audio context initialization for better mobile support
+        this.audioContext = null;
+        this.initializeAudio();
 
         // Calculate the circumference of the circle
         const radius = this.progressRing.r.baseVal.value;
@@ -170,12 +176,46 @@ class PomodoroTimer {
         this.updateHeader();
     }
 
+    initializeAudio() {
+        // Create audio context on user interaction
+        document.addEventListener('click', () => {
+            if (!this.audioContext) {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Resume audio context
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+                } catch (e) {
+                    console.error('Web Audio API is not supported in this browser');
+                }
+            }
+        }, { once: true });
+    }
+
     playAlarm() {
-        // Play the MP3 sound
-        this.alarmSound.currentTime = 0; // Reset to start of sound
-        this.alarmSound.play().catch(error => {
-            console.error('Error playing sound:', error);
-        });
+        // Play the MP3 sound with better mobile support
+        try {
+            this.alarmSound.currentTime = 0;
+            const playPromise = this.alarmSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error('Error playing sound:', error);
+                    // Try to play again if it failed due to user interaction requirement
+                    if (error.name === 'NotAllowedError') {
+                        // Show a message to the user
+                        this.statusText.textContent = 'Tap anywhere to enable sound';
+                        // Add one-time click listener to play sound
+                        document.addEventListener('click', () => {
+                            this.alarmSound.play().catch(e => console.error('Still unable to play:', e));
+                        }, { once: true });
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error with audio playback:', error);
+        }
 
         const activeButton = document.querySelector('.mode button.active');
         const isBreak = activeButton.id === 'break';

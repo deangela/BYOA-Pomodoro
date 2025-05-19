@@ -10,6 +10,8 @@ class PomodoroTimer {
         this.pomodoroTimeInput = document.getElementById('pomodoro-time');
         this.breakTimeInput = document.getElementById('break-time');
         this.progressRing = document.querySelector('.progress-ring-circle');
+        this.focusInput = document.getElementById('focus-input');
+        this.focusText = '';
         
         // Initialize audio
         this.alarmSound = new Audio('sound/Soul Train A Comin.mp3');
@@ -34,6 +36,17 @@ class PomodoroTimer {
         this.resetButton.addEventListener('click', () => this.reset());
         this.pomodoroButton.addEventListener('click', () => this.setMode('pomodoro'));
         this.breakButton.addEventListener('click', () => this.setMode('break'));
+        
+        // Add event listener for focus input
+        this.focusInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && this.focusInput.value.trim()) {
+                this.focusText = this.focusInput.value.trim();
+                this.statusText.innerHTML = `${this.focusText} is your focus`; // Update the status text on one line
+                this.updateHeader();
+                this.focusInput.value = '';
+                this.focusInput.style.display = 'none'; // Hide the input field
+            }
+        });
         
         // Add event listeners for time inputs
         this.pomodoroTimeInput.addEventListener('change', () => {
@@ -67,16 +80,18 @@ class PomodoroTimer {
         this.startPauseButton.textContent = 'Pause';
         const activeButton = document.querySelector('.mode button.active');
         if (activeButton.id === 'pomodoro') {
-            this.statusText.textContent = "CONGRATULATIONS! You are focusing!";
+            this.statusText.textContent = this.focusText || "CONGRATULATIONS! You are focusing!";
         } else {
             this.statusText.textContent = "After you've rested, get back to work.";
         }
+        this.updateHeader();
         this.timerId = setInterval(() => this.updateTimer(), 1000);
     }
 
     pause() {
         this.isRunning = false;
         this.startPauseButton.textContent = 'Start';
+        document.title = "Paused - Pomodoro Timer";
         clearInterval(this.timerId);
     }
 
@@ -85,6 +100,10 @@ class PomodoroTimer {
         this.alarmSound.pause();
         this.alarmSound.currentTime = 0;
         this.statusText.textContent = "Ready to focus?";
+        this.focusText = '';
+        document.title = "Pomodoro Timer";
+        this.focusInput.style.display = 'block'; // Show the input field
+        this.focusInput.placeholder = 'What do you want to focus on?'; // Set placeholder text
         this.setMode('pomodoro');
     }
 
@@ -131,6 +150,14 @@ class PomodoroTimer {
         }
     }
 
+    updateHeader() {
+        if (this.isRunning && this.focusText) {
+            document.title = `${this.minutesElement.textContent}:${this.secondsElement.textContent} - ${this.focusText}`;
+        } else if (this.isRunning) {
+            document.title = `${this.minutesElement.textContent}:${this.secondsElement.textContent} - Pomodoro Timer`;
+        }
+    }
+
     updateDisplay() {
         const minutes = Math.floor(this.timeLeft / 60);
         const seconds = this.timeLeft % 60;
@@ -139,8 +166,8 @@ class PomodoroTimer {
         this.minutesElement.textContent = minutes.toString().padStart(2, '0');
         this.secondsElement.textContent = seconds.toString().padStart(2, '0');
         
-        // Update the document title with the timer
-        document.title = `${timeString} - Pomodoro Timer`;
+        // Update the document title with the timer and focus text
+        this.updateHeader();
     }
 
     playAlarm() {

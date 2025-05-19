@@ -84,6 +84,7 @@ class PomodoroTimer {
         this.pause();
         this.alarmSound.pause();
         this.alarmSound.currentTime = 0;
+        this.statusText.textContent = "Ready to focus?";
         this.setMode('pomodoro');
     }
 

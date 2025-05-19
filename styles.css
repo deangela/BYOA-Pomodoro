@@ -19,12 +19,17 @@ body {
     border-radius: 1rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    width: 95%;
+    max-width: 500px;
+    margin: 1rem;
 }
 
 .timer-container {
     position: relative;
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    aspect-ratio: 1;
     margin: 2rem auto;
 }
 
@@ -46,7 +51,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 4rem;
+    font-size: clamp(2.5rem, 8vw, 4rem);
     font-weight: bold;
     color: #4a0a7d;
 }
@@ -58,18 +63,20 @@ h1 {
 
 .controls, .mode {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     justify-content: center;
     margin: 1rem 0;
+    flex-wrap: wrap;
 }
 
 button {
     padding: 0.8rem 1.5rem;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 4vw, 1rem);
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    min-width: 80px;
 }
 
 .controls button {
@@ -100,11 +107,12 @@ button {
 }
 
 .status-text {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 4vw, 1.2rem);
     color: #2c3e50;
     margin: 1rem 0;
     min-height: 2rem;
     font-weight: bold;
+    padding: 0 0.5rem;
 }
 
 .time-settings {
@@ -148,11 +156,11 @@ button {
 }
 
 .focus-input input {
-    padding: 8px 12px;
+    padding: 12px 16px;
     border: 2px solid #9b6bdf;
     border-radius: 20px;
-    font-size: 16px;
-    width: 80%;
+    font-size: clamp(14px, 4vw, 16px);
+    width: 90%;
     max-width: 300px;
     outline: none;
     transition: border-color 0.3s ease;
@@ -167,4 +175,48 @@ button {
 .focus-input input::placeholder {
     color: #9b6bdf;
     opacity: 0.7;
+}
+
+/* Media Queries */
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .controls, .mode {
+        gap: 0.3rem;
+    }
+
+    button {
+        padding: 0.7rem 1.2rem;
+    }
+
+    .setting {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .setting input {
+        width: 80px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .container {
+        padding: 0.8rem;
+    }
+
+    .timer-container {
+        margin: 1rem auto;
+    }
+
+    button {
+        padding: 0.6rem 1rem;
+        min-width: 70px;
+    }
 } 
